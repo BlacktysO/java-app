@@ -1,38 +1,46 @@
-import java.util.Scanner;
+package com.example.advancedapp;
 
-public class Main {
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+@SpringBootApplication
+public class AdvancedApplication {
     public static void main(String[] args) {
-        System.out.println("🚀 Welcome to the Advanced Dockerized Java App! 🚀");
+        SpringApplication.run(AdvancedApplication.class, args);
+    }
+}
 
-        // Reading environment variables
+@RestController
+class GreetingController {
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+    @GetMapping("/greet")
+    public String greet(@RequestParam(value = "name", defaultValue = "User") String name) {
         String appName = System.getenv("APP_NAME");
         if (appName == null || appName.isEmpty()) {
-            appName = "Default Java App";
+            appName = "Default Java Web App";
         }
-        System.out.println("App Name: " + appName);
-
-        // Interactive input
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine();
-
-        // Simulate some work with threads
-        System.out.println("Processing your request...");
-        simulateProcessing();
-
-        // Final message
-        System.out.println("Hello, " + name + "! 🎉");
-        System.out.println("Thanks for trying out " + appName + ".");
         
-        scanner.close();
+        executorService.submit(() -> simulateProcessing());
+
+        return "Hello, " + name + "! 🎉 Welcome to " + appName;
     }
 
-    private static void simulateProcessing() {
+    private void simulateProcessing() {
         try {
             for (int i = 1; i <= 3; i++) {
-                System.out.println("Step " + i + " of 3...");
+                System.out.println("Processing step " + i + " of 3...");
                 Thread.sleep(1000);
             }
+            System.out.println("Processing complete!");
         } catch (InterruptedException e) {
             System.out.println("Processing interrupted!");
         }
